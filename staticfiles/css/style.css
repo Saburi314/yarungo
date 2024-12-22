@@ -1,0 +1,20 @@
+.task-priority-lowest {
+    background-color: blue;
+    color: white;
+}
+.task-priority-low {
+    background-color: green;
+    color: white;
+}
+.task-priority-normal {
+    background-color: white;
+    color: black;
+}
+.task-priority-high {
+    background-color: orange;
+    color: white;
+}
+.task-priority-highest {
+    background-color: red;
+    color: white;
+}

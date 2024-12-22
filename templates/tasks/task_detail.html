@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}タスク詳細{% endblock %}
+
+{% block content %}
+<h2>{{ task.title }}</h2>
+<p><strong>詳細:</strong> {{ task.description }}</p>
+<p><strong>予定日:</strong> {{ task.due_date|date:"Y-m-d H:i" }}</p>
+<p><strong>優先度:</strong> {{ task.get_priority_display }}</p>
+<p><strong>状態:</strong> {% if task.is_completed %}完了{% else %}未完了{% endif %}</p>
+
+<h3>サブタスク</h3>
+<ul>
+    {% for subtask in task.subtasks.all %}
+    <li>
+        <a href="{% url 'task_detail' subtask.id %}">{{ subtask.title }}</a>
+        {% if subtask.is_completed %} - 完了{% endif %}
+    </li>
+    {% empty %}
+    <li>サブタスクがありません。</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'task_update' task.id %}" class="btn btn-warning">編集</a>
+<a href="{% url 'task_delete' task.id %}" class="btn btn-danger">削除</a>
+<a href="{% url 'task_create' %}" class="btn btn-primary">サブタスク作成</a>
+<a href="{% url 'task_list' %}" class="btn btn-secondary">戻る</a>
+{% endblock %}

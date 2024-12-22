@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}
+        タスク編集
+    {% else %}
+        タスク作成
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>
+    {% if form.instance.pk %}
+        タスク編集
+    {% else %}
+        タスク作成
+    {% endif %}
+</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">
+        {% if form.instance.pk %}
+            更新
+        {% else %}
+            作成
+        {% endif %}
+    </button>
+</form>
+
+<a href="{% url 'task_list' %}" class="btn btn-secondary mt-3">戻る</a>
+{% endblock %}

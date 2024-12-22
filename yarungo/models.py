@@ -1,33 +1,64 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.urls import reverse
+import uuid
+from django.utils.timezone import now
+
+class CustomUser(AbstractUser):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
+    def __str__(self):
+        return self.username
 
 class Task(models.Model):
     PRIORITY_CHOICES = [
-        (1, '1 - 最優先'),
-        (2, '2 - 高'),
-        (3, '3 - 中'),
-        (4, '4 - 低'),
-        (5, '5 - 最低'),
+        ('lowest', '最低'),
+        ('low', '低'),
+        ('normal', '通常'),
+        ('high', '高'),
+        ('highest', '最高'),
     ]
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # タスク固有のUUID
     title = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)  # null と blank を許可
-    due_date = models.DateTimeField(null=True, blank=True)  # null と blank を許可
-    is_completed = models.BooleanField(default=False)
-    priority = models.IntegerField(choices=PRIORITY_CHOICES, default=3, null=True, blank=True)  # null と blank を許可
+    description = models.TextField(blank=True, null=True)
+    due_date = models.DateTimeField(blank=True, null=True)
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='normal')
+    completed_at = models.DateTimeField(blank=True, null=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)  # ログインユーザーが関連付けられる場合
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subtasks')
 
     def __str__(self):
-        return f"{self.title} - 優先順位: {self.get_priority_display()}"
+        return self.title
+
+    @property
+    def is_completed(self):
+        return self.completed_at is not None
 
     def get_priority_color(self):
-        """ 優先順位に応じて色を返す """
-        if self.priority == 1:
-            return 'red'  # 最優先
-        elif self.priority == 2:
-            return 'orange'  # 高
-        elif self.priority == 3:
-            return 'yellow'  # 中
-        elif self.priority == 4:
-            return 'blue'  # 低
-        elif self.priority == 5:
-            return 'green'  # 最低
-        return 'white'  # デフォルト
+        colors = {
+            'lowest': 'blue',
+            'low': 'green',
+            'normal': 'white',
+            'high': 'orange',
+            'highest': 'red',
+        }
+        return colors.get(self.priority, 'white')
+
+    def get_absolute_url(self):
+        return reverse('task_detail', args=[str(self.id)])
+
+    def mark_as_completed(self):
+        self.completed_at = now()
+        self.save()
+
+    def mark_as_deleted(self):
+        self.deleted_at = now()
+        self.save(update_fields=['deleted_at']) 
+
+    class Meta:
+        ordering = ['sort_order', 'created_at']

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}完了タスク一覧{% endblock %}
+
+{% block content %}
+<h2>完了タスク一覧</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>タイトル</th>
+            <th>期限</th>
+            <th>完了日</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+        <tr>
+            <td>{{ task.title }}</td>
+            <td>{{ task.due_date|date:"Y-m-d H:i" }}</td>
+            <td>{{ task.completed_at|date:"Y-m-d H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3" class="text-center">完了タスクはありません。</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'task_list' %}" class="btn btn-secondary">戻る</a>
+{% endblock %}

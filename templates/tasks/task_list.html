@@ -1,29 +1,49 @@
-{% extends 'tasks/base.html' %}
+{% extends 'base.html' %}
 
-{% load static %}
-
-{% block title %}Task List{% endblock %}
+{% block title %}タスク一覧{% endblock %}
 
 {% block content %}
-    <h1>タスク一覧</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>タイトル</th>
-                <th>優先順位</th>
-                <th>期限</th>
-                <th>完了</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for task in tasks %}
-                <tr class="priority-{{ task.priority }}">
-                    <td>{{ task.title }}</td>
-                    <td>{{ task.get_priority_display }}</td>
-                    <td>{{ task.due_date }}</td>
-                    <td>{{ task.is_completed }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<h2>タスク一覧</h2>
+<div class="mb-3">
+    <a href="{% url 'task_create' %}" class="btn btn-primary">新規タスク作成</a>
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>完了</th>
+            <th>タイトル</th>
+            <th>期限</th>
+            <th>アクション</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+        <tr>
+            <td>
+                <form method="post" action="{% url 'task_update' task.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-link p-0" type="submit">
+                        {% if task.is_completed %}
+                        <i class="fas fa-check-circle text-success"></i>
+                        {% else %}
+                        <i class="far fa-circle text-secondary"></i>
+                        {% endif %}
+                    </button>
+                </form>
+            </td>
+            <td><a href="{% url 'task_detail' task.id %}">{{ task.title }}</a></td>
+            <td>{{ task.due_date|date:"Y-m-d H:i" }}</td>
+            <td>
+                <a href="{% url 'task_detail' task.id %}" class="btn btn-info btn-sm">詳細</a>
+                <a href="{% url 'task_update' task.id %}" class="btn btn-warning btn-sm">編集</a>
+                <a href="{% url 'task_delete' task.id %}" class="btn btn-danger btn-sm">削除</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-center">タスクがありません。</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
