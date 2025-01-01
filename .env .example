@@ -1,0 +1,6 @@
+DB_ENGINE=django.db.backends.mysql
+DB_NAME=yarungo
+DB_USER=saburi314
+DB_PASSWORD=saburi314_password
+DB_HOST=db
+DB_PORT=3306
