@@ -31,12 +31,9 @@
                     </button>
                 </form>
             </td>
-            <td><a href="{% url 'task_detail' task.id %}">{{ task.title }}</a></td>
             <td>{{ task.due_date|date:"Y-m-d H:i" }}</td>
             <td>
-                <a href="{% url 'task_detail' task.id %}" class="btn btn-info btn-sm">詳細</a>
-                <a href="{% url 'task_update' task.id %}" class="btn btn-warning btn-sm">編集</a>
-                <a href="{% url 'task_delete' task.id %}" class="btn btn-danger btn-sm">削除</a>
+
             </td>
         </tr>
         {% empty %}
