@@ -18,7 +18,7 @@
     </thead>
     <tbody>
         {% for task in tasks %}
-        <tr data-task-id="{{ task.id }}">
+        <tr class="{{ task.get_priority_css_class }}" data-task-id="{{ task.id }}">
             <td>
                 <button class="btn btn-link p-0 complete-task-btn">
                     {% if task.completed_at %}
@@ -35,8 +35,16 @@
             </td>
             <td>{{ task.due_date|date:"Y-m-d H:i" }}</td>
             <td>
+                <!-- 削除ボタン -->
                 <button class="btn btn-danger btn-sm delete-task-btn" data-task-id="{{ task.id }}" title="削除">
                     <i class="fas fa-trash"></i>
+                </button>
+                <!-- 並び替えボタン -->
+                <button class="btn btn-sm btn-light reorder-btn" data-task-id="{{ task.id }}" data-direction="up">
+                    ↑
+                </button>
+                <button class="btn btn-sm btn-light reorder-btn" data-task-id="{{ task.id }}" data-direction="down">
+                    ↓
                 </button>
             </td>
         </tr>
@@ -139,5 +147,32 @@ document.querySelectorAll('.complete-task-btn').forEach(button => {
     });
 });
 
+document.querySelectorAll('.reorder-btn').forEach(button => {
+    button.addEventListener('click', event => {
+        const taskId = event.target.dataset.taskId;
+        const direction = event.target.dataset.direction;
+
+        fetch("{% url 'task_reorder' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ task_id: taskId, direction: direction }),
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Reorder failed');
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                location.reload();  // ページをリロードして並び順を更新
+            } else {
+                alert(data.error || '並び順の変更に失敗しました。');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
 </script>
 {% endblock %}

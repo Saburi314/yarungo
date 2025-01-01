@@ -15,7 +15,7 @@
     </thead>
     <tbody>
         {% for task in tasks %}
-        <tr data-task-id="{{ task.id }}">
+        <tr class="{{ task.get_priority_css_class }}" data-task-id="{{ task.id }}">
             <td>
                 <a href="{% url 'task_update' task.id %}" class="text-decoration-none">
                     {{ task.title }}

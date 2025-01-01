@@ -1,20 +1,11 @@
-.task-priority-lowest {
-    background-color: blue;
-    color: white;
+.priority-high {
+    background-color: #f8d7da; /* 赤系 */
 }
-.task-priority-low {
-    background-color: green;
-    color: white;
+
+.priority-medium {
+    background-color: #fff3cd; /* 黄色系 */
 }
-.task-priority-normal {
-    background-color: white;
-    color: black;
-}
-.task-priority-high {
-    background-color: orange;
-    color: white;
-}
-.task-priority-highest {
-    background-color: red;
-    color: white;
+
+.priority-low {
+    background-color: #d4edda; /* 緑系 */
 }

@@ -22,7 +22,6 @@ class SignUpView(CreateView):
         print("入力データ:", form.cleaned_data)  # クリーン済みデータを出力
         return super().form_invalid(form)
 
-
 class TaskListView(LoginRequiredMixin, ListView):
     model = Task
     template_name = 'tasks/task_list.html'
@@ -91,6 +90,33 @@ class TaskCompleteAjaxView(LoginRequiredMixin, View):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
+class TaskReorderAjaxView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        try:
+            task_id = request.POST.get('task_id')
+            direction = request.POST.get('direction')  # "up" or "down"
+            task = get_object_or_404(Task, id=task_id, user=request.user)
+
+            # 並び順の変更
+            if direction == 'up':
+                swap_task = Task.objects.filter(
+                    user=request.user, sort_order__lt=task.sort_order
+                ).order_by('-sort_order').first()
+            elif direction == 'down':
+                swap_task = Task.objects.filter(
+                    user=request.user, sort_order__gt=task.sort_order
+                ).order_by('sort_order').first()
+            else:
+                return JsonResponse({'success': False, 'error': 'Invalid direction'}, status=400)
+
+            if swap_task:
+                task.swap_sort_order(swap_task)
+                return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'success': False, 'error': 'No task to swap'})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 class CompletedTaskListView(LoginRequiredMixin, ListView):
     model = Task
@@ -102,4 +128,4 @@ class CompletedTaskListView(LoginRequiredMixin, ListView):
             user=self.request.user,
             completed_at__isnull=False,
             deleted_at__isnull=True
-        )
+        ).order_by('-completed_at')  # 完了日時で降順にソート

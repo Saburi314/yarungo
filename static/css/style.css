@@ -1,56 +1,11 @@
-/* static/css/style.css */
-
-/* 全体のマージンとパディングをリセット */
-body {
-    padding-bottom: 60px; /* 固定下部ナビゲーションバーのスペースを確保 */
+.priority-high td {
+    background-color: #f8d7da; /* 赤系 */
 }
 
-/* タスク一覧のスタイル */
-.task-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    border-bottom: 1px solid #dee2e6;
+.priority-medium td {
+    background-color: #fff3cd; /* 黄色系 */
 }
 
-.task-item .left,
-.task-item .center,
-.task-item .right {
-    display: flex;
-    align-items: center;
-}
-
-.task-item .left {
-    width: 10%;
-}
-
-.task-item .center {
-    width: 70%;
-}
-
-.task-item .right {
-    width: 20%;
-    justify-content: flex-end;
-}
-
-.task-item .center .title {
-    margin-right: 10px;
-}
-
-.task-item .subtask-marker {
-    margin-left: 10px;
-    color: #6c757d;
-}
-
-.task-item .action-btn {
-    margin-left: 5px;
-}
-
-.fixed-bottom-nav {
-    height: 60px;
-}
-
-.alert {
-    margin-bottom: 20px;
+.priority-low td {
+    background-color: #d4edda; /* 緑系 */
 }
