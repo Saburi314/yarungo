@@ -10,21 +10,70 @@
             <th>タイトル</th>
             <th>期限</th>
             <th>完了日</th>
+            <th>アクション</th>
         </tr>
     </thead>
     <tbody>
         {% for task in tasks %}
-        <tr>
-            <td>{{ task.title }}</td>
+        <tr data-task-id="{{ task.id }}">
+            <td>
+                <a href="{% url 'task_update' task.id %}" class="text-decoration-none">
+                    {{ task.title }}
+                </a>
+            </td>
             <td>{{ task.due_date|date:"Y-m-d H:i" }}</td>
             <td>{{ task.completed_at|date:"Y-m-d H:i" }}</td>
+            <td>
+                <button class="btn btn-warning btn-sm incomplete-task-btn" title="未完了に戻す">
+                    未完了に戻す
+                </button>
+            </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="3" class="text-center">完了タスクはありません。</td>
+            <td colspan="4" class="text-center">完了タスクはありません。</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 <a href="{% url 'task_list' %}" class="btn btn-secondary">戻る</a>
+
+<script>
+    const csrftoken = '{{ csrf_token }}';
+
+    document.querySelectorAll('.incomplete-task-btn').forEach(button => {
+        button.addEventListener('click', event => {
+            const taskRow = event.target.closest('tr');
+            const taskId = taskRow.dataset.taskId;
+
+            // 確認ダイアログ
+            const confirmIncomplete = confirm("このタスクを未完了に戻しますか？");
+            if (!confirmIncomplete) return;
+
+            fetch(`/yarungo/tasks/${taskId}/complete_ajax/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('未完了リクエストに失敗しました。');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success && !data.completed) {
+                    taskRow.remove(); // 未完了に戻したら行を削除
+                } else {
+                    alert(`エラー: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('サーバーエラー:', error);
+            });
+        });
+    });
+</script>
 {% endblock %}
