@@ -6,7 +6,7 @@ from .views import (
     CompletedTaskListView,
     TaskCreateView,
     TaskUpdateView,
-    TaskDeleteView,
+    TaskDeleteAjaxView,  # Ajaxビューをインポート
 )
 
 urlpatterns = [
@@ -20,7 +20,7 @@ urlpatterns = [
     path('tasks/completed/', CompletedTaskListView.as_view(), name='completed_tasks'),
     path('tasks/create/', TaskCreateView.as_view(), name='task_create'),
     path('tasks/<int:pk>/update/', TaskUpdateView.as_view(), name='task_update'),
-    path('tasks/<int:pk>/delete/', TaskDeleteView.as_view(), name='task_delete'),
+    path('tasks/<int:pk>/delete_ajax/', TaskDeleteAjaxView.as_view(), name='task_delete_ajax'),
 
     # ルートURL
     path('', TaskListView.as_view(), name='home'),

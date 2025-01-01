@@ -1,11 +1,16 @@
 from django.shortcuts import redirect
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.timezone import now
 from .models import Task
 from .forms import CustomUserCreationForm
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+import logging
+
+logger = logging.getLogger(__name__)
 
 class SignUpView(CreateView):
     form_class = CustomUserCreationForm
@@ -30,6 +35,11 @@ class TaskListView(LoginRequiredMixin, ListView):
             deleted_at__isnull=True
         ).order_by('sort_order')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['now'] = now()  # 現在時刻をテンプレートに渡す
+        return context
+
 class TaskCreateView(LoginRequiredMixin, CreateView):
     model = Task
     fields = ['title', 'description', 'due_date', 'priority', 'parent']
@@ -52,13 +62,18 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
         form.save()
         return redirect('task_list')
 
-class TaskDeleteView(LoginRequiredMixin, DeleteView):
-    model = Task
+class TaskDeleteAjaxView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        task_id = kwargs.get('pk')
+        try:
+            task = get_object_or_404(Task, id=task_id, user=request.user)
+            task.mark_as_deleted()  # 論理削除
+            return JsonResponse({'success': True, 'task_id': task_id})
+        except Task.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Task not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
-    def delete(self, request, *args, **kwargs):
-        task = self.get_object()
-        task.mark_as_deleted()
-        return redirect('task_list')
 
 class CompletedTaskListView(LoginRequiredMixin, ListView):
     model = Task

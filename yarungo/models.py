@@ -48,4 +48,4 @@ class Task(models.Model):
         """タスクとサブタスクを論理削除する"""
         self.deleted_at = now()
         self.save(update_fields=['deleted_at'])
-        self.subtasks.update(deleted_at=now())
+        self.subtasks.update(deleted_at=now())  # サブタスクの削除
