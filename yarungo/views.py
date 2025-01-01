@@ -32,7 +32,8 @@ class TaskListView(LoginRequiredMixin, ListView):
         return Task.objects.filter(
             user=self.request.user,
             parent__isnull=True,
-            deleted_at__isnull=True
+            deleted_at__isnull=True,
+            completed_at__isnull=True  # 完了済みタスクを除外
         ).order_by('sort_order')
 
     def get_context_data(self, **kwargs):
@@ -73,6 +74,22 @@ class TaskDeleteAjaxView(LoginRequiredMixin, View):
             return JsonResponse({'success': False, 'error': 'Task not found'}, status=404)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+class TaskCompleteAjaxView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        task_id = self.kwargs.get('pk')
+        try:
+            task = get_object_or_404(Task, id=task_id, user=self.request.user)
+            if task.completed_at:
+                task.completed_at = None  # 完了を解除
+                completed = False
+            else:
+                task.completed_at = now()  # 完了日時を設定
+                completed = True
+            task.save(update_fields=['completed_at'])
+            return JsonResponse({'success': True, 'completed': completed})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 
 class CompletedTaskListView(LoginRequiredMixin, ListView):

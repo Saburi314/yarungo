@@ -20,16 +20,13 @@
         {% for task in tasks %}
         <tr data-task-id="{{ task.id }}">
             <td>
-                <form method="post" action="{% url 'task_update' task.id %}">
-                    {% csrf_token %}
-                    <button class="btn btn-link p-0" type="submit">
-                        {% if task.completed_at %}
-                        <i class="fas fa-check-circle text-success"></i>
-                        {% else %}
-                        <i class="far fa-circle text-secondary"></i>
-                        {% endif %}
-                    </button>
-                </form>
+                <button class="btn btn-link p-0 complete-task-btn">
+                    {% if task.completed_at %}
+                    <i class="fas fa-check-circle text-success"></i>
+                    {% else %}
+                    <i class="far fa-circle text-secondary"></i>
+                    {% endif %}
+                </button>
             </td>
             <td>
                 <a href="{% url 'task_update' task.id %}" class="text-decoration-none">
@@ -42,7 +39,7 @@
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
-        </tr>        
+        </tr>
         {% empty %}
         <tr>
             <td colspan="4" class="text-center">タスクがありません。</td>
@@ -52,15 +49,15 @@
 </table>
 
 <script>
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-    }
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
 
-    const csrftoken = getCookie('csrftoken');
-</script>
-<script>
+const csrftoken = getCookie('csrftoken');
+
+// 削除ボタン非同期処理
 document.querySelectorAll('.delete-task-btn').forEach(button => {
     button.addEventListener('click', event => {
         const taskId = event.target.closest('button').dataset.taskId;
@@ -96,5 +93,51 @@ document.querySelectorAll('.delete-task-btn').forEach(button => {
         });
     });
 });
+
+//完了ボタン非同期処理
+document.querySelectorAll('.complete-task-btn').forEach(button => {
+    button.addEventListener('click', event => {
+        const taskRow = event.target.closest('tr');
+        const taskId = taskRow.dataset.taskId;
+
+        // 確認ダイアログ
+        const confirmComplete = confirm("このタスクを完了にしますか？");
+        if (!confirmComplete) {
+            return; // ユーザーがキャンセルした場合は処理を終了
+        }
+
+        fetch(`/yarungo/tasks/${taskId}/complete_ajax/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('完了リクエストに失敗しました。');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                const icon = button.querySelector('i');
+                if (data.completed) {
+                    icon.classList.remove('far', 'text-secondary');
+                    icon.classList.add('fas', 'text-success');
+                } else {
+                    icon.classList.remove('fas', 'text-success');
+                    icon.classList.add('far', 'text-secondary');
+                }
+            } else {
+                alert(`エラー: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            console.error('サーバーエラー:', error);
+        });
+    });
+});
+
 </script>
 {% endblock %}
