@@ -47,6 +47,12 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'description', 'due_date', 'priority']
+        labels = {
+            'title': 'タイトル',  # 日本語のラベル
+            'description': '詳細',
+            'due_date': '締め切り',
+            'priority': '優先度',
+        }
         widgets = {
             'due_date': forms.DateTimeInput(attrs={
                 'type': 'datetime-local',

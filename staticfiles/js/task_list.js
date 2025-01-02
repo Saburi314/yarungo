@@ -98,45 +98,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const taskList = document.getElementById("task-list");
 
     let draggedRow = null;
+    let touchStartY = 0;
 
-    taskList.addEventListener("dragstart", (event) => {
-        const dragHandle = event.target.closest(".drag-handle");
+    // ドラッグ開始の共通処理
+    const startDrag = (row, y) => {
+        draggedRow = row;
+        draggedRow.style.opacity = 0.5;
+        touchStartY = y; // タッチ開始位置を保存
+    };
 
-        if (!dragHandle) {
-            event.preventDefault();
-            return;
-        }
-
-        draggedRow = dragHandle.closest("tr");
-        if (draggedRow) {
-            draggedRow.style.opacity = 0.5;
-        }
-    });
-
-    taskList.addEventListener("dragend", () => {
+    // ドラッグ終了の共通処理
+    const endDrag = () => {
         if (draggedRow) {
             draggedRow.style.opacity = "";
         }
         draggedRow = null;
-    });
+    };
 
-    taskList.addEventListener("dragover", (event) => {
-        event.preventDefault();
-        const closestRow = event.target.closest("tr");
-        if (closestRow && closestRow !== draggedRow) {
-            const bounding = closestRow.getBoundingClientRect();
-            const offset = event.clientY - bounding.top - bounding.height / 2;
-            if (offset > 0) {
-                taskList.insertBefore(draggedRow, closestRow.nextSibling);
-            } else {
-                taskList.insertBefore(draggedRow, closestRow);
-            }
-        }
-    });
-
-    taskList.addEventListener("drop", () => {
-        if (!draggedRow) return;
-
+    // 並び順を保存
+    const saveOrder = () => {
         const order = Array.from(taskList.querySelectorAll("tr")).map(
             (row, index) => ({ id: row.dataset.taskId, order: index + 1 })
         );
@@ -149,13 +129,86 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             body: JSON.stringify({ order }),
         })
-        .then((response) => {
-            if (!response.ok) throw new Error("並び替えの保存に失敗しました。");
-            return response.json();
-        })
-        .then((data) => {
-            if (!data.success) alert("並び替えの保存中にエラーが発生しました。");
-        })
-        .catch((error) => console.error("Error:", error));
+            .then((response) => {
+                if (!response.ok) throw new Error("並び替えの保存に失敗しました。");
+                return response.json();
+            })
+            .then((data) => {
+                if (!data.success) alert("並び替えの保存中にエラーが発生しました。");
+            })
+            .catch((error) => console.error("Error:", error));
+    };
+
+    // スマホ向けタッチイベント
+    taskList.addEventListener("touchstart", (event) => {
+        const touchHandle = event.target.closest(".drag-handle");
+        if (!touchHandle) return;
+
+        const row = touchHandle.closest("tr");
+        const touchY = event.touches[0].clientY; // タッチ開始位置
+        startDrag(row, touchY);
+    });
+
+    taskList.addEventListener("touchmove", (event) => {
+        if (!draggedRow) return;
+
+        const touchY = event.touches[0].clientY;
+        const closestRow = document.elementFromPoint(
+            event.touches[0].clientX,
+            touchY
+        )?.closest("tr");
+
+        if (closestRow && closestRow !== draggedRow) {
+            const bounding = closestRow.getBoundingClientRect();
+            const offset = touchY - bounding.top - bounding.height / 2;
+
+            if (offset > 0) {
+                taskList.insertBefore(draggedRow, closestRow.nextSibling);
+            } else {
+                taskList.insertBefore(draggedRow, closestRow);
+            }
+        }
+    });
+
+    taskList.addEventListener("touchend", () => {
+        if (draggedRow) {
+            saveOrder();
+        }
+        endDrag();
+    });
+
+    // PC向けドラッグイベント
+    taskList.addEventListener("dragstart", (event) => {
+        const dragHandle = event.target.closest(".drag-handle");
+        if (!dragHandle) {
+            event.preventDefault();
+            return;
+        }
+        startDrag(dragHandle.closest("tr"), event.clientY);
+    });
+
+    taskList.addEventListener("dragend", endDrag);
+
+    taskList.addEventListener("dragover", (event) => {
+        event.preventDefault();
+
+        const closestRow = event.target.closest("tr");
+        if (closestRow && closestRow !== draggedRow) {
+            const bounding = closestRow.getBoundingClientRect();
+            const offset = event.clientY - bounding.top - bounding.height / 2;
+
+            if (offset > 0) {
+                taskList.insertBefore(draggedRow, closestRow.nextSibling);
+            } else {
+                taskList.insertBefore(draggedRow, closestRow);
+            }
+        }
+    });
+
+    taskList.addEventListener("drop", () => {
+        if (!draggedRow) return;
+        saveOrder();
+        endDrag();
     });
 });
+
