@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}完了タスク一覧{% endblock %}
 
 {% block content %}
@@ -37,43 +39,9 @@
     </tbody>
 </table>
 <a href="{% url 'task_list' %}" class="btn btn-secondary">戻る</a>
-
-<script>
-    const csrftoken = '{{ csrf_token }}';
-
-    document.querySelectorAll('.incomplete-task-btn').forEach(button => {
-        button.addEventListener('click', event => {
-            const taskRow = event.target.closest('tr');
-            const taskId = taskRow.dataset.taskId;
-
-            // 確認ダイアログ
-            const confirmIncomplete = confirm("このタスクを未完了に戻しますか？");
-            if (!confirmIncomplete) return;
-
-            fetch(`/yarungo/tasks/${taskId}/complete_ajax/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrftoken,
-                    'Content-Type': 'application/json',
-                },
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('未完了リクエストに失敗しました。');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success && !data.completed) {
-                    taskRow.remove(); // 未完了に戻したら行を削除
-                } else {
-                    alert(`エラー: ${data.error}`);
-                }
-            })
-            .catch(error => {
-                console.error('サーバーエラー:', error);
-            });
-        });
-    });
-</script>
 {% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/completed_task_list.js' %}"></script>
+{% endblock %}
+

@@ -1,11 +1,11 @@
-.priority-high {
+.priority-high td {
     background-color: #f8d7da; /* 赤系 */
 }
 
-.priority-medium {
+.priority-medium td {
     background-color: #fff3cd; /* 黄色系 */
 }
 
-.priority-low {
+.priority-low td {
     background-color: #d4edda; /* 緑系 */
 }

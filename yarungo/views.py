@@ -33,7 +33,7 @@ class TaskListView(LoginRequiredMixin, ListView):
             parent__isnull=True,
             deleted_at__isnull=True,
             completed_at__isnull=True  # 完了済みタスクを除外
-        ).order_by('sort_order')
+        ).order_by('-sort_order')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
