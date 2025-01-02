@@ -42,7 +42,7 @@ class TaskListView(LoginRequiredMixin, ListView):
 
 class TaskCreateView(LoginRequiredMixin, CreateView):
     model = Task
-    fields = ['title', 'description', 'due_date', 'priority', 'parent']
+    fields = ['title', 'description', 'due_date', 'priority']
     template_name = 'tasks/task_form.html'
 
     def form_valid(self, form):
@@ -93,30 +93,26 @@ class TaskCompleteAjaxView(LoginRequiredMixin, View):
 class TaskReorderAjaxView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         try:
-            task_id = request.POST.get('task_id')
-            direction = request.POST.get('direction')  # "up" or "down"
-            task = get_object_or_404(Task, id=task_id, user=request.user)
+            import json
+            data = json.loads(request.body)
 
-            # 並び順の変更
-            if direction == 'up':
-                swap_task = Task.objects.filter(
-                    user=request.user, sort_order__lt=task.sort_order
-                ).order_by('-sort_order').first()
-            elif direction == 'down':
-                swap_task = Task.objects.filter(
-                    user=request.user, sort_order__gt=task.sort_order
-                ).order_by('sort_order').first()
-            else:
-                return JsonResponse({'success': False, 'error': 'Invalid direction'}, status=400)
+            # 新しい順序データを取得
+            order_data = data.get('order', [])
+            if not order_data:
+                return JsonResponse({'success': False, 'error': 'Invalid data'}, status=400)
 
-            if swap_task:
-                task.swap_sort_order(swap_task)
-                return JsonResponse({'success': True})
-            else:
-                return JsonResponse({'success': False, 'error': 'No task to swap'})
+            # タスクを更新
+            for item in order_data:
+                task = Task.objects.filter(id=item['id'], user=request.user).first()
+                if task:
+                    task.sort_order = item['order']
+                    task.save(update_fields=['sort_order'])
 
+            return JsonResponse({'success': True})
         except Exception as e:
+            logger.error(f"Task reorder error: {str(e)}")
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
 
 class CompletedTaskListView(LoginRequiredMixin, ListView):
     model = Task

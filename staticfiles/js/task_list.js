@@ -83,30 +83,74 @@ document.querySelectorAll('.complete-task-btn').forEach(button => {
 });
 
 // 並び替えボタン非同期処理
-document.querySelectorAll('.reorder-btn').forEach(button => {
-    button.addEventListener('click', event => {
-        const taskId = event.target.dataset.taskId;
-        const direction = event.target.dataset.direction;
+document.addEventListener("DOMContentLoaded", () => {
+    const taskList = document.getElementById("task-list");
 
-        fetch("/yarungo/tasks/reorder/", {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ task_id: taskId, direction: direction }),
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Reorder failed');
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                location.reload();
+    let draggedRow = null;
+
+    // ドラッグ開始イベント
+    taskList.addEventListener("dragstart", (event) => {
+        const dragHandle = event.target.closest(".drag-handle"); // ドラッグハンドルを確認
+        if (!dragHandle) {
+            event.preventDefault(); // ドラッグを禁止
+            return;
+        }
+
+        draggedRow = dragHandle.closest("tr"); // 親行を取得
+        if (draggedRow) {
+            draggedRow.style.opacity = 0.5; // 視覚的なフィードバック
+        }
+    });
+
+    // ドラッグ終了イベント
+    taskList.addEventListener("dragend", () => {
+        if (draggedRow) {
+            draggedRow.style.opacity = ""; // 元に戻す
+            draggedRow = null;
+        }
+    });
+
+    // ドラッグオーバーイベント
+    taskList.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        const closestRow = event.target.closest("tr"); // ドラッグ対象の行
+        if (closestRow && closestRow !== draggedRow) {
+            const bounding = closestRow.getBoundingClientRect();
+            const offset = event.clientY - bounding.top - bounding.height / 2;
+            if (offset > 0) {
+                taskList.insertBefore(draggedRow, closestRow.nextSibling); // 次の行の下に挿入
             } else {
-                alert(data.error || '並び順の変更に失敗しました。');
+                taskList.insertBefore(draggedRow, closestRow); // 現在の行の上に挿入
             }
+        }
+    });
+
+    // ドロップイベント
+    taskList.addEventListener("drop", () => {
+        if (!draggedRow) return;
+
+        // 並び替え後の順序を取得
+        const order = Array.from(taskList.querySelectorAll("tr")).map(
+            (row, index) => ({ id: row.dataset.taskId, order: index + 1 })
+        );
+
+        // サーバーに送信
+        fetch("/yarungo/tasks/reorder/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ order }),
         })
-        .catch(error => console.error('Error:', error));
+            .then((response) => {
+                if (!response.ok) throw new Error("並び替えの保存に失敗しました。");
+                return response.json();
+            })
+            .then((data) => {
+                if (!data.success) alert("並び替えの保存中にエラーが発生しました。");
+            })
+            .catch((error) => console.error("Error:", error));
     });
 });
+

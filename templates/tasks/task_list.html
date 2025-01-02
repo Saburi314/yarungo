@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}タスク一覧{% endblock %}
 
 {% block content %}
@@ -13,12 +15,13 @@
             <th>完了</th>
             <th>タイトル</th>
             <th>期限</th>
-            <th>アクション</th>
+            <th>削除</th>
+            <th>並び替え</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="task-list">
         {% for task in tasks %}
-        <tr class="{{ task.get_priority_css_class }}" data-task-id="{{ task.id }}">
+        <tr class="{{ task.get_priority_css_class }}" data-task-id="{{ task.id }}" draggable="true">
             <td>
                 <button class="btn btn-link p-0 complete-task-btn" data-completed="{{ task.completed_at|yesno:"true,false" }}">
                     {% if task.completed_at %}
@@ -35,25 +38,24 @@
             </td>
             <td>{{ task.due_date|date:"Y-m-d H:i" }}</td>
             <td>
-                <!-- 削除ボタン -->
                 <button class="btn btn-danger btn-sm delete-task-btn" data-task-id="{{ task.id }}" title="削除">
                     <i class="fas fa-trash"></i>
                 </button>
-                <!-- 並び替えボタン -->
-                <button class="btn btn-sm btn-light reorder-btn" data-task-id="{{ task.id }}" data-direction="up">
-                    ↑
-                </button>
-                <button class="btn btn-sm btn-light reorder-btn" data-task-id="{{ task.id }}" data-direction="down">
-                    ↓
-                </button>
+            </td>
+            <td>
+                <i class="fas fa-arrows-alt-v drag-handle" draggable="true"></i> <!-- ドラッグ可能に設定 -->
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="4" class="text-center">タスクがありません。</td>
+            <td colspan="5" class="text-center">タスクがありません。</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/task_list.js' %}"></script>
 {% endblock %}
