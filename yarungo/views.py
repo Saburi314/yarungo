@@ -9,6 +9,8 @@ from django.views.generic import CreateView
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 import logging
+from django import forms
+from .models import Task
 
 logger = logging.getLogger(__name__)
 
@@ -39,10 +41,21 @@ class TaskListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['now'] = now()  # 現在時刻をテンプレートに渡す
         return context
+    
+class TaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['title', 'description', 'due_date', 'priority']
+        widgets = {
+            'due_date': forms.DateTimeInput(attrs={
+                'type': 'datetime-local',
+                'class': 'form-control',  # Bootstrap適用の場合
+            }),
+        }
 
 class TaskCreateView(LoginRequiredMixin, CreateView):
     model = Task
-    fields = ['title', 'description', 'due_date', 'priority']
+    form_class = TaskForm  # フォームクラスを使用
     template_name = 'tasks/task_form.html'
 
     def form_valid(self, form):
@@ -55,7 +68,7 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
 
 class TaskUpdateView(LoginRequiredMixin, UpdateView):
     model = Task
-    fields = ['title', 'description', 'due_date', 'priority']
+    form_class = TaskForm  # フォームクラスを使用
     template_name = 'tasks/task_form.html'
 
     def form_valid(self, form):
