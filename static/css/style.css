@@ -1,3 +1,4 @@
+/* タスク一覧画面 */
 .priority-high td {
     background-color: #f8d7da; /* 赤系 */
 }
@@ -8,4 +9,19 @@
 
 .priority-low td {
     background-color: #d4edda; /* 緑系 */
+}
+
+
+/* ログイン画面 */
+.card {
+    border-radius: 10px;
+}
+
+.card h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+form .form-control {
+    border-radius: 5px;
 }

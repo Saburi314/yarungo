@@ -3,11 +3,44 @@
 {% block title %}ログイン{% endblock %}
 
 {% block content %}
-<h2>ログイン</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">ログイン</button>
-</form>
-<a href="{% url 'signup' %}" class="btn btn-secondary mt-3">アカウント作成</a>
+<div class="d-flex justify-content-center align-items-center">
+    <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
+        <h2 class="text-center mb-4">ログイン</h2>
+        <form method="post">
+            {% csrf_token %}
+            
+            <!-- 全体の非フィールドエラー -->
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- ユーザー名入力 -->
+            <div class="mb-3">
+                {{ form.username.label_tag }}
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <!-- パスワード入力 -->
+            <div class="mb-3">
+                {{ form.password.label_tag }}
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="text-danger small">{{ form.password.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">ログイン</button>
+        </form>
+        <div class="text-center mt-3">
+            <a href="{% url 'signup' %}" class="btn btn-link">アカウントを作成する</a>
+        </div>
+    </div>
+</div>
 {% endblock %}
