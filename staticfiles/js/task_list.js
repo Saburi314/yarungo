@@ -101,6 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     taskList.addEventListener("dragstart", (event) => {
         const dragHandle = event.target.closest(".drag-handle");
+
         if (!dragHandle) {
             event.preventDefault();
             return;

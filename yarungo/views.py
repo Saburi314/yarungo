@@ -12,6 +12,7 @@ import logging
 from django import forms
 from .models import Task
 
+
 logger = logging.getLogger(__name__)
 
 class SignUpView(CreateView):
