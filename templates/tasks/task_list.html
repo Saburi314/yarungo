@@ -20,7 +20,7 @@
         {% for task in tasks %}
         <tr class="{{ task.get_priority_css_class }}" data-task-id="{{ task.id }}">
             <td>
-                <button class="btn btn-link p-0 complete-task-btn">
+                <button class="btn btn-link p-0 complete-task-btn" data-completed="{{ task.completed_at|yesno:"true,false" }}">
                     {% if task.completed_at %}
                     <i class="fas fa-check-circle text-success"></i>
                     {% else %}
