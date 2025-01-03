@@ -9,9 +9,9 @@
 <table class="table table-striped">
     <tbody id="task-list">
         {% for task in tasks %}
-        <tr class="{{ task.get_priority_css_class }}" data-task-id="{{ task.id }}" draggable="true">
+        <tr class="{{ task.get_priority_css_class }}" data-task-id="{{ task.id }}">
             <td class="complete-column">
-                <button class="btn btn-link p-0 complete-task-btn" data-completed="{{ task.completed_at|yesno:"true,false" }}">
+                <button class="btn btn-link p-0 complete-task-btn" data-completed="{{ task.completed_at|yesno:'true,false' }}">
                     {% if task.completed_at %}
                     <i class="fas fa-check-circle text-success"></i>
                     {% else %}
@@ -24,16 +24,16 @@
                     {{ task.title }}
                 </a>
             </td>
-            <td class="due-column">{{ task.due_date|date:"Y-m-d H:i" }}</td>
+            <td class="due-column">{{ task.due_date|date:'Y-m-d H:i' }}</td>
             <td class="delete-column">
                 <button class="btn btn-danger btn-sm delete-task-btn" data-task-id="{{ task.id }}" title="削除">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
-            <td class="reorder-column">
+            <td class="reorder-column" draggable="false">
                 <i class="fas fa-arrows-alt-v drag-handle" draggable="true"></i>
             </td>
-        </tr>
+        </tr>        
         {% empty %}
         <tr>
             <td colspan="5" class="text-center">タスクがありません。</td>

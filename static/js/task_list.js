@@ -91,72 +91,101 @@ document.querySelectorAll('.delete-task-btn').forEach(button => {
 });
 
 // 並び替えボタン非同期処理
-document.addEventListener("DOMContentLoaded", () => {
-    const taskList = document.getElementById("task-list");
+document.addEventListener('DOMContentLoaded', function () {
+    const taskList = document.getElementById('task-list');
 
-    let draggedRow = null;
+    let draggedElement = null;
+    let touchStartY = 0;
 
-    taskList.addEventListener("dragstart", (event) => {
-        // ドラッグ開始要素が drag-handle であることを確認
-        if (!event.target.classList.contains("drag-handle")) {
-            event.preventDefault(); // ドラッグを禁止
-            return;
+    function handleDragStart(e) {
+        if (e.target.classList.contains('drag-handle')) {
+            draggedElement = e.target.closest('tr');
+            e.dataTransfer.effectAllowed = 'move';
+        } else {
+            e.preventDefault();
         }
+    }
 
-        // ドラッグ対象行を取得
-        draggedRow = event.target.closest("tr");
-        if (draggedRow) {
-            draggedRow.style.opacity = 0.5; // 視覚的なフィードバック
-        }
-    });
-
-    taskList.addEventListener("dragend", () => {
-        if (draggedRow) {
-            draggedRow.style.opacity = ""; // 元に戻す
-        }
-        draggedRow = null;
-    });
-
-    taskList.addEventListener("dragover", (event) => {
-        event.preventDefault();
-        const closestRow = event.target.closest("tr");
-        if (closestRow && closestRow !== draggedRow) {
-            const bounding = closestRow.getBoundingClientRect();
-            const offset = event.clientY - bounding.top - bounding.height / 2;
-            if (offset > 0) {
-                taskList.insertBefore(draggedRow, closestRow.nextSibling); // 次の行の下に挿入
+    function handleDragOver(e) {
+        e.preventDefault();
+        const targetRow = e.target.closest('tr');
+        if (targetRow && draggedElement !== targetRow) {
+            const bounding = targetRow.getBoundingClientRect();
+            const offset = e.clientY - bounding.top;
+            const midpoint = bounding.height / 2;
+            if (offset > midpoint) {
+                taskList.insertBefore(draggedElement, targetRow.nextSibling);
             } else {
-                taskList.insertBefore(draggedRow, closestRow); // 現在の行の上に挿入
+                taskList.insertBefore(draggedElement, targetRow);
             }
         }
-    });
+    }
 
-    taskList.addEventListener("drop", () => {
-        if (!draggedRow) return;
+    function handleTouchStart(e) {
+        const touchTarget = e.target;
+        if (touchTarget.classList.contains('drag-handle')) {
+            draggedElement = touchTarget.closest('tr');
+            touchStartY = e.touches[0].clientY;
+        } else {
+            draggedElement = null;
+        }
+    }
 
-        // 並び替え後の順序を取得
-        const order = Array.from(taskList.querySelectorAll("tr")).map(
-            (row, index) => ({ id: row.dataset.taskId, order: index + 1 })
-        );
+    function handleTouchMove(e) {
+        if (!draggedElement) return;
 
-        // サーバーに送信
-        fetch("/tasks/reorder/", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": getCookie("csrftoken"),
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ order }),
-        })
-            .then((response) => {
-                if (!response.ok) throw new Error("並び替えの保存に失敗しました。");
-                return response.json();
-            })
-            .then((data) => {
-                if (!data.success) alert("並び替えの保存中にエラーが発生しました。");
-            })
-            .catch((error) => console.error("Error:", error));
-    });
+        const touchY = e.touches[0].clientY;
+        const targetRow = document.elementFromPoint(e.touches[0].clientX, touchY)?.closest('tr');
+
+        if (targetRow && draggedElement !== targetRow) {
+            const bounding = targetRow.getBoundingClientRect();
+            const offset = touchY - bounding.top;
+            const midpoint = bounding.height / 2;
+            if (offset > midpoint) {
+                taskList.insertBefore(draggedElement, targetRow.nextSibling);
+            } else {
+                taskList.insertBefore(draggedElement, targetRow);
+            }
+        }
+    }
+
+    function handleTouchEnd() {
+        if (draggedElement) {
+            draggedElement = null;
+
+            // 並び替え後の順序を取得してサーバーに送信
+            const orderData = Array.from(taskList.children).map((row, index) => ({
+                id: row.dataset.taskId,
+                order: index + 1,
+            }));
+
+            fetch('/tasks/reorder/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: JSON.stringify({ order: orderData }),
+            }).then(response => {
+                if (!response.ok) {
+                    console.error('Reorder failed');
+                }
+            });
+        }
+    }
+
+    taskList.addEventListener('dragstart', handleDragStart);
+    taskList.addEventListener('dragover', handleDragOver);
+    taskList.addEventListener('dragend', handleTouchEnd);
+
+    taskList.addEventListener('touchstart', handleTouchStart);
+    taskList.addEventListener('touchmove', handleTouchMove);
+    taskList.addEventListener('touchend', handleTouchEnd);
 });
+
+
+
+
+
 
 
