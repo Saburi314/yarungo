@@ -95,15 +95,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const taskList = document.getElementById('task-list');
 
     let draggedElement = null;
-    let touchStartY = 0;
 
     function handleDragStart(e) {
-        if (e.target.classList.contains('drag-handle')) {
-            draggedElement = e.target.closest('tr');
-            e.dataTransfer.effectAllowed = 'move';
-        } else {
-            e.preventDefault();
-        }
+        draggedElement = e.target.closest('tr');
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => draggedElement.classList.add('dragging'), 0);
     }
 
     function handleDragOver(e) {
@@ -121,36 +117,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function handleTouchStart(e) {
-        const touchTarget = e.target;
-        if (touchTarget.classList.contains('drag-handle')) {
-            draggedElement = touchTarget.closest('tr');
-            touchStartY = e.touches[0].clientY;
-        } else {
-            draggedElement = null;
-        }
-    }
-
-    function handleTouchMove(e) {
-        if (!draggedElement) return;
-
-        const touchY = e.touches[0].clientY;
-        const targetRow = document.elementFromPoint(e.touches[0].clientX, touchY)?.closest('tr');
-
-        if (targetRow && draggedElement !== targetRow) {
-            const bounding = targetRow.getBoundingClientRect();
-            const offset = touchY - bounding.top;
-            const midpoint = bounding.height / 2;
-            if (offset > midpoint) {
-                taskList.insertBefore(draggedElement, targetRow.nextSibling);
-            } else {
-                taskList.insertBefore(draggedElement, targetRow);
-            }
-        }
-    }
-
-    function handleTouchEnd() {
+    function handleDragEnd() {
         if (draggedElement) {
+            draggedElement.classList.remove('dragging');
             draggedElement = null;
 
             // 並び替え後の順序を取得してサーバーに送信
@@ -174,15 +143,40 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function handleTouchStart(e) {
+        draggedElement = e.target.closest('tr');
+    }
+
+    function handleTouchMove(e) {
+        if (!draggedElement) return;
+
+        const touchY = e.touches[0].clientY;
+        const targetRow = document.elementFromPoint(e.touches[0].clientX, touchY)?.closest('tr');
+
+        if (targetRow && draggedElement !== targetRow) {
+            const bounding = targetRow.getBoundingClientRect();
+            const offset = touchY - bounding.top;
+            const midpoint = bounding.height / 2;
+            if (offset > midpoint) {
+                taskList.insertBefore(draggedElement, targetRow.nextSibling);
+            } else {
+                taskList.insertBefore(draggedElement, targetRow);
+            }
+        }
+    }
+
+    function handleTouchEnd() {
+        handleDragEnd();
+    }
+
     taskList.addEventListener('dragstart', handleDragStart);
     taskList.addEventListener('dragover', handleDragOver);
-    taskList.addEventListener('dragend', handleTouchEnd);
+    taskList.addEventListener('dragend', handleDragEnd);
 
     taskList.addEventListener('touchstart', handleTouchStart);
     taskList.addEventListener('touchmove', handleTouchMove);
     taskList.addEventListener('touchend', handleTouchEnd);
 });
-
 
 
 
