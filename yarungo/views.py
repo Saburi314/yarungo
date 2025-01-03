@@ -121,18 +121,21 @@ class TaskReorderAjaxView(LoginRequiredMixin, View):
             if not order_data:
                 return JsonResponse({'success': False, 'error': 'Invalid data'}, status=400)
 
+            # 降順の順序を計算
+            max_order = len(order_data)
+
             # タスクを更新
             for item in order_data:
                 task = Task.objects.filter(id=item['id'], user=request.user).first()
                 if task:
-                    task.sort_order = item['order']
+                    # 降順の値を計算して保存
+                    task.sort_order = max_order - item['order'] + 1
                     task.save(update_fields=['sort_order'])
 
             return JsonResponse({'success': True})
         except Exception as e:
             logger.error(f"Task reorder error: {str(e)}")
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
-
 
 class CompletedTaskListView(LoginRequiredMixin, ListView):
     model = Task
