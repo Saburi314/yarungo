@@ -50,7 +50,7 @@ class TaskForm(forms.ModelForm):
         labels = {
             'title': 'タイトル',  # 日本語のラベル
             'description': '詳細',
-            'due_date': '締め切り',
+            'due_date': '期限',
             'priority': '優先度',
         }
         widgets = {
