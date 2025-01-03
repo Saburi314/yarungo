@@ -145,6 +145,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function handleTouchStart(e) {
         draggedElement = e.target.closest('tr');
+        if (draggedElement) {
+            e.preventDefault(); // スクロールや引き下げ更新を防止
+        }
     }
 
     function handleTouchMove(e) {
@@ -163,20 +166,43 @@ document.addEventListener('DOMContentLoaded', function () {
                 taskList.insertBefore(draggedElement, targetRow);
             }
         }
+        e.preventDefault(); // スクロールや引き下げ更新を防止
     }
 
-    function handleTouchEnd() {
-        handleDragEnd();
+    function handleTouchEnd(e) {
+        if (draggedElement) {
+            draggedElement = null;
+
+            // 並び替え後の順序を取得してサーバーに送信
+            const orderData = Array.from(taskList.children).map((row, index) => ({
+                id: row.dataset.taskId,
+                order: index + 1,
+            }));
+
+            fetch('/tasks/reorder/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: JSON.stringify({ order: orderData }),
+            }).then(response => {
+                if (!response.ok) {
+                    console.error('Reorder failed');
+                }
+            });
+        }
     }
 
     taskList.addEventListener('dragstart', handleDragStart);
     taskList.addEventListener('dragover', handleDragOver);
     taskList.addEventListener('dragend', handleDragEnd);
 
-    taskList.addEventListener('touchstart', handleTouchStart);
-    taskList.addEventListener('touchmove', handleTouchMove);
+    taskList.addEventListener('touchstart', handleTouchStart, { passive: false }); // passive: false を指定
+    taskList.addEventListener('touchmove', handleTouchMove, { passive: false });  // passive: false を指定
     taskList.addEventListener('touchend', handleTouchEnd);
 });
+
 
 
 
