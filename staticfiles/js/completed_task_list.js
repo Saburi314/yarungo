@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const confirmIncomplete = confirm("このタスクを未完了に戻しますか？");
             if (!confirmIncomplete) return;
 
-            fetch(`/yarungo/tasks/${taskId}/complete_ajax/`, {
+            fetch(`/tasks/${taskId}/complete_ajax/`, {
                 method: "POST",
                 headers: {
                     "X-CSRFToken": csrftoken,

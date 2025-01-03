@@ -18,7 +18,7 @@ document.querySelectorAll('.complete-task-btn').forEach(button => {
             if (!confirm("このタスクを完了にしますか？")) return;
         }
 
-        fetch(`/yarungo/tasks/${taskId}/complete_ajax/`, {
+        fetch(`/tasks/${taskId}/complete_ajax/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': csrftoken,
@@ -64,7 +64,7 @@ document.querySelectorAll('.delete-task-btn').forEach(button => {
         const isConfirmed = confirm('このタスクを削除しますか？');
         if (!isConfirmed) return;
 
-        fetch(`/yarungo/tasks/${taskId}/delete_ajax/`, {
+        fetch(`/tasks/${taskId}/delete_ajax/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': csrftoken,
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         // サーバーに送信
-        fetch("/yarungo/tasks/reorder/", {
+        fetch("/tasks/reorder/", {
             method: "POST",
             headers: {
                 "X-CSRFToken": getCookie("csrftoken"),

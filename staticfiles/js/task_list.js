@@ -7,13 +7,9 @@ function getCookie(name) {
 const csrftoken = getCookie('csrftoken');
 
 // 完了ボタン非同期処理
-document.addEventListener('click', (event) => {
-    if (event.target.closest('.complete-task-btn')) {
-
-        console.log('test');
-        
-        const button = event.target.closest('.complete-task-btn');
-        const taskRow = button.closest('tr');
+document.querySelectorAll('.complete-task-btn').forEach(button => {
+    button.addEventListener('click', event => {
+        const taskRow = event.target.closest('tr');
         const taskId = taskRow.dataset.taskId;
         const isCompleted = button.dataset.completed === "true";
 
@@ -22,7 +18,7 @@ document.addEventListener('click', (event) => {
             if (!confirm("このタスクを完了にしますか？")) return;
         }
 
-        fetch(`/yarungo/tasks/${taskId}/complete_ajax/`, {
+        fetch(`/tasks/${taskId}/complete_ajax/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': csrftoken,
@@ -39,11 +35,13 @@ document.addEventListener('click', (event) => {
             if (data.success) {
                 const icon = button.querySelector('i');
                 if (data.completed) {
+                    // タスクを完了に変更
                     icon.classList.remove('far', 'text-secondary');
                     icon.classList.add('fas', 'text-success');
                     button.dataset.completed = "true";
-                    taskRow.remove();
+                    taskRow.remove(); // 完了済みの場合はリストから削除
                 } else {
+                    // タスクを未完了に戻す（確認ダイアログなし）
                     icon.classList.remove('fas', 'text-success');
                     icon.classList.add('far', 'text-secondary');
                     button.dataset.completed = "false";
@@ -55,19 +53,18 @@ document.addEventListener('click', (event) => {
         .catch(error => {
             console.error('サーバーエラー:', error);
         });
-    }
+    });
 });
 
 // 削除ボタン非同期処理
-document.addEventListener('click', (event) => {
-    if (event.target.closest('.delete-task-btn')) {
-        const button = event.target.closest('.delete-task-btn');
-        const taskId = button.dataset.taskId;
+document.querySelectorAll('.delete-task-btn').forEach(button => {
+    button.addEventListener('click', event => {
+        const taskId = event.target.closest('button').dataset.taskId;
 
         const isConfirmed = confirm('このタスクを削除しますか？');
         if (!isConfirmed) return;
 
-        fetch(`/yarungo/tasks/${taskId}/delete_ajax/`, {
+        fetch(`/tasks/${taskId}/delete_ajax/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': csrftoken,
@@ -90,7 +87,7 @@ document.addEventListener('click', (event) => {
         .catch(error => {
             console.error('サーバーエラー:', error);
         });
-    }
+    });
 });
 
 // 並び替えボタン非同期処理
@@ -98,33 +95,55 @@ document.addEventListener("DOMContentLoaded", () => {
     const taskList = document.getElementById("task-list");
 
     let draggedRow = null;
-    let touchStartY = 0;
 
-    // ドラッグ開始の共通処理
-    const startDrag = (row, y) => {
-        draggedRow = row;
-        draggedRow.style.opacity = 0.5;
-        touchStartY = y; // タッチ開始位置を保存
-    };
+    taskList.addEventListener("dragstart", (event) => {
+        // ドラッグ開始要素が drag-handle であることを確認
+        if (!event.target.classList.contains("drag-handle")) {
+            event.preventDefault(); // ドラッグを禁止
+            return;
+        }
 
-    // ドラッグ終了の共通処理
-    const endDrag = () => {
+        // ドラッグ対象行を取得
+        draggedRow = event.target.closest("tr");
         if (draggedRow) {
-            draggedRow.style.opacity = "";
+            draggedRow.style.opacity = 0.5; // 視覚的なフィードバック
+        }
+    });
+
+    taskList.addEventListener("dragend", () => {
+        if (draggedRow) {
+            draggedRow.style.opacity = ""; // 元に戻す
         }
         draggedRow = null;
-    };
+    });
 
-    // 並び順を保存
-    const saveOrder = () => {
+    taskList.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        const closestRow = event.target.closest("tr");
+        if (closestRow && closestRow !== draggedRow) {
+            const bounding = closestRow.getBoundingClientRect();
+            const offset = event.clientY - bounding.top - bounding.height / 2;
+            if (offset > 0) {
+                taskList.insertBefore(draggedRow, closestRow.nextSibling); // 次の行の下に挿入
+            } else {
+                taskList.insertBefore(draggedRow, closestRow); // 現在の行の上に挿入
+            }
+        }
+    });
+
+    taskList.addEventListener("drop", () => {
+        if (!draggedRow) return;
+
+        // 並び替え後の順序を取得
         const order = Array.from(taskList.querySelectorAll("tr")).map(
             (row, index) => ({ id: row.dataset.taskId, order: index + 1 })
         );
 
-        fetch("/yarungo/tasks/reorder/", {
+        // サーバーに送信
+        fetch("/tasks/reorder/", {
             method: "POST",
             headers: {
-                "X-CSRFToken": csrftoken,
+                "X-CSRFToken": getCookie("csrftoken"),
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ order }),
@@ -137,78 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!data.success) alert("並び替えの保存中にエラーが発生しました。");
             })
             .catch((error) => console.error("Error:", error));
-    };
-
-    // スマホ向けタッチイベント
-    taskList.addEventListener("touchstart", (event) => {
-        const touchHandle = event.target.closest(".drag-handle");
-        if (!touchHandle) return;
-
-        const row = touchHandle.closest("tr");
-        const touchY = event.touches[0].clientY; // タッチ開始位置
-        startDrag(row, touchY);
-    });
-
-    taskList.addEventListener("touchmove", (event) => {
-        if (!draggedRow) return;
-
-        const touchY = event.touches[0].clientY;
-        const closestRow = document.elementFromPoint(
-            event.touches[0].clientX,
-            touchY
-        )?.closest("tr");
-
-        if (closestRow && closestRow !== draggedRow) {
-            const bounding = closestRow.getBoundingClientRect();
-            const offset = touchY - bounding.top - bounding.height / 2;
-
-            if (offset > 0) {
-                taskList.insertBefore(draggedRow, closestRow.nextSibling);
-            } else {
-                taskList.insertBefore(draggedRow, closestRow);
-            }
-        }
-    });
-
-    taskList.addEventListener("touchend", () => {
-        if (draggedRow) {
-            saveOrder();
-        }
-        endDrag();
-    });
-
-    // PC向けドラッグイベント
-    taskList.addEventListener("dragstart", (event) => {
-        const dragHandle = event.target.closest(".drag-handle");
-        if (!dragHandle) {
-            event.preventDefault();
-            return;
-        }
-        startDrag(dragHandle.closest("tr"), event.clientY);
-    });
-
-    taskList.addEventListener("dragend", endDrag);
-
-    taskList.addEventListener("dragover", (event) => {
-        event.preventDefault();
-
-        const closestRow = event.target.closest("tr");
-        if (closestRow && closestRow !== draggedRow) {
-            const bounding = closestRow.getBoundingClientRect();
-            const offset = event.clientY - bounding.top - bounding.height / 2;
-
-            if (offset > 0) {
-                taskList.insertBefore(draggedRow, closestRow.nextSibling);
-            } else {
-                taskList.insertBefore(draggedRow, closestRow);
-            }
-        }
-    });
-
-    taskList.addEventListener("drop", () => {
-        if (!draggedRow) return;
-        saveOrder();
-        endDrag();
     });
 });
+
 
