@@ -22,7 +22,7 @@ SECRET_KEY = env('SECRET_KEY', default='default-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG', default=False)
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '54.168.88.217']
 
 # Application definition
 
