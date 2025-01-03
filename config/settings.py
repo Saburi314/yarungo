@@ -133,9 +133,9 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = '/yarungo/login/'  # ログインページのURL
+LOGIN_URL = '/login/'  # ログインページのURL
 
-LOGIN_REDIRECT_URL = '/yarungo/tasks'  # ログイン後に遷移するURL（タスク一覧画面へ）
+LOGIN_REDIRECT_URL = '/tasks'  # ログイン後に遷移するURL（タスク一覧画面へ）
 
 AUTH_USER_MODEL = 'yarungo.CustomUser'
 
