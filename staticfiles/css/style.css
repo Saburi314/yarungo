@@ -1,4 +1,6 @@
 /* タスク一覧画面 */
+
+/* タスクの優先度 背景色 */
 .priority-high td {
     background-color: #f8d7da; /* 赤系 */
 }
@@ -9,6 +11,17 @@
 
 .priority-low td {
     background-color: #d4edda; /* 緑系 */
+}
+
+/* 並び替えアイコン */
+.drag-handle {
+    font-size: 1.5rem; /* アイコンのサイズを大きくする */
+    cursor: grab; /* マウスカーソルの見た目を保持 */
+    display: flex; /* アイコンを中央寄せ */
+    justify-content: center;
+    align-items: center;
+    width: 2rem; /* 横幅を調整 */
+    height: 2rem; /* 縦幅を調整 */
 }
 
 
