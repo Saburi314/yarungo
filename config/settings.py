@@ -17,12 +17,12 @@ environ.Env.read_env(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6p9qnj--(o0r9gs)z(cda7fdzxb*)4ef7$@std%6964o*c*_c3'
+SECRET_KEY = env('SECRET_KEY', default='default-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG', default=False)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '54.168.88.217']
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])
 
 
 # Application definition
@@ -139,10 +139,10 @@ LOGIN_REDIRECT_URL = '/tasks'  # ログイン後に遷移するURL（タスク�
 
 AUTH_USER_MODEL = 'yarungo.CustomUser'
 
-# TODO 本番リリース時はTrueへ
-SECURE_SSL_REDIRECT = False  # 開発環境では False に設定
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+SECURE_SSL_REDIRECT = env('SECURE_SSL_REDIRECT', default=False)
+SESSION_COOKIE_SECURE = env('SESSION_COOKIE_SECURE', default=False)
+CSRF_COOKIE_SECURE = env('CSRF_COOKIE_SECURE', default=False)
+
 
 # ログ設定
 LOGGING = {
