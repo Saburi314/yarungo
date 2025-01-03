@@ -24,6 +24,13 @@
     height: 2rem; /* 縦幅を調整 */
 }
 
+/* 締め切り日時 */
+.due-date {
+    font-size: 0.8rem; /* 小さい文字サイズに設定 */
+    margin-top: 2px;   /* タイトルとの間に少し余白を追加 */
+    color: #6c757d;    /* Bootstrapの muted カラー */
+}
+
 
 /* ログイン画面 */
 .card {

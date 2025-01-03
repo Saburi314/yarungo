@@ -14,9 +14,10 @@
                 <a href="{% url 'task_update' task.id %}" class="text-decoration-none">
                     {{ task.title }}
                 </a>
-            </td>
-            <td>{{ task.due_date|date:"Y-m-d H:i" }}</td>
-            <td>{{ task.completed_at|date:"Y-m-d H:i" }}</td>
+                <div class="completed-date text-muted">
+                    完了日時: {{ task.completed_at|date:"Y-m-d H:i" }}
+                </div>
+            </td>            
             <td>
                 <button class="btn btn-warning btn-sm incomplete-task-btn" title="未完了へ">
                     未完了へ
