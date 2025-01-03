@@ -9,7 +9,7 @@
 <table class="table table-striped">
     <tbody id="task-list">
         {% for task in tasks %}
-        <tr class="{{ task.get_priority_css_class }}" data-task-id="{{ task.id }}">
+        <tr class="{{ task.get_priority_css_class }}" data-task-id="{{ task.id }}" draggable="true">
             <td class="complete-column">
                 <button class="btn btn-link p-0 complete-task-btn" data-completed="{{ task.completed_at|yesno:'true,false' }}">
                     {% if task.completed_at %}
@@ -20,36 +20,30 @@
                 </button>
             </td>
             <td class="title-column">
-                <a href="{% url 'task_update' task.id %}" class="text-decoration-none">
-                    {{ task.title }}
-                </a>
-                <div class="due-date text-muted">
-                    期限: {{ task.due_date|date:'Y-m-d H:i' }}
-                </div>
+                <a href="{% url 'task_update' task.id %}" class="text-decoration-none">{{ task.title }}</a>
+                <div class="due-date text-muted">期限: {{ task.due_date|date:'Y-m-d H:i' }}</div>
             </td>
             <td class="delete-column">
-                <button class="btn btn-danger btn-sm delete-task-btn" data-task-id="{{ task.id }}" title="削除">
+                <button class="btn btn-danger btn-sm delete-task-btn" title="削除">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
-            <td class="reorder-column" draggable="false">
-                <i class="fas fa-arrows-alt-v drag-handle" draggable="true"></i>
+            <td class="reorder-column">
+                <i class="fas fa-arrows-alt-v drag-handle" draggable="false"></i>
             </td>
-        </tr>        
+        </tr>
         {% empty %}
         <tr>
-            <td colspan="5" class="text-center">タスクがありません。</td>
+            <td colspan="4" class="text-center">タスクがありません。</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<!-- 新規作成ボタン（タスク一覧ページのみ） -->
-<a href="{% url 'task_create' %}" class="btn btn-success rounded-circle shadow-lg position-fixed" 
+<a href="{% url 'task_create' %}" class="btn btn-success rounded-circle shadow-lg position-fixed"
     style="width: 60px; height: 60px; bottom: 80px; right: 20px; display: flex; justify-content: center; align-items: center;">
     <i class="fas fa-plus fa-lg"></i>
 </a>
-
 {% endblock %}
 
 {% block extra_js %}

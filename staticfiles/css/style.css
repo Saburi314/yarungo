@@ -13,6 +13,13 @@
     background-color: #d4edda; /* 緑系 */
 }
 
+/* 期限日時 */
+.due-date {
+    font-size: 0.8rem; /* 小さい文字サイズに設定 */
+    margin-top: 2px;   /* タイトルとの間に少し余白を追加 */
+    color: #6c757d;    /* Bootstrapの muted カラー */
+}
+
 /* 並び替えアイコン */
 .drag-handle {
     font-size: 1.5rem; /* アイコンのサイズを大きくする */
@@ -24,11 +31,29 @@
     height: 2rem; /* 縦幅を調整 */
 }
 
-/* 期限日時 */
-.due-date {
-    font-size: 0.8rem; /* 小さい文字サイズに設定 */
-    margin-top: 2px;   /* タイトルとの間に少し余白を追加 */
-    color: #6c757d;    /* Bootstrapの muted カラー */
+.dragging {
+    opacity: 0.5;
+    background-color: #f0f0f0;
+}
+
+/* タスク行全体でカーソルを適用 */
+#task-list tr {
+    cursor: default; /* 通常時はデフォルトカーソル */
+}
+
+#task-list tr:hover {
+    cursor: grab; /* ホバー時にドラッグ可能なカーソル */
+}
+
+/* クリック可能なボタンやリンク上ではデフォルトカーソル */
+#task-list tr a, 
+#task-list tr button {
+    cursor: pointer; /* クリック可能なカーソル */
+}
+
+/* ドラッグ中の要素には手を離すカーソル */
+#task-list tr.dragging {
+    cursor: grabbing;
 }
 
 
@@ -44,4 +69,11 @@
 
 form .form-control {
     border-radius: 5px;
+}
+
+/* 完了済み画面 */
+.completed-date {
+    font-size: 0.8rem; /* 小さい文字サイズに設定 */
+    margin-top: 2px;   /* タイトルとの間に少し余白を追加 */
+    color: #6c757d;    /* Bootstrapの muted カラー */
 }
