@@ -39,7 +39,11 @@
                 <label for="{{ field.id_for_label }}" class="form-label fw-bold">
                     {{ field.label }}
                 </label>
-                {{ field|add_class:"form-control" }}
+                {% if field.name == "priority" %}
+                    {{ field|add_class:"form-control" }}
+                {% else %}
+                    {{ field|add_class:"form-control" }}
+                {% endif %}
                 {% if field.errors %}
                 <div class="text-danger small mt-1">
                     {% for error in field.errors %}
@@ -64,4 +68,33 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const prioritySelect = document.getElementById('id_priority');
+
+    // 初期設定で背景色を変更
+    updateBackgroundColor(prioritySelect);
+
+    // 選択値が変更されたときに背景色を変更
+    prioritySelect.addEventListener('change', () => {
+        updateBackgroundColor(prioritySelect);
+    });
+
+    function updateBackgroundColor(selectElement) {
+        // 背景色をリセット
+        selectElement.style.backgroundColor = '';
+
+        // 選択値に応じた背景色を設定
+        const value = selectElement.value;
+        if (value === "1") {
+            selectElement.style.backgroundColor = '#d4edda'; // 低 (緑)
+        } else if (value === "5") {
+            selectElement.style.backgroundColor = '#fff3cd'; // 普通 (黄)
+        } else if (value === "10") {
+            selectElement.style.backgroundColor = '#f8d7da'; // 高 (赤)
+        }
+    }
+});
+</script>
 {% endblock %}
