@@ -114,12 +114,7 @@ form .form-control {
     color: #6c757d;    /* Bootstrapの muted カラー */
 }
 
-/* タスク一覧画面での下部マージ */
+/* スマホ用の下部マージ */
 main.container.mt-4 {
-    margin-bottom: 150px;
-}
-
-/* タスク作成、編集画面での下部マージ */
-.card.shadow-sm.p-4 {
     margin-bottom: 150px;
 }
