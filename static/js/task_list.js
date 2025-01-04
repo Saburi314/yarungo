@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     taskList.addEventListener('dragstart', (e) => {
         draggedElement = e.target.closest('tr');
         if (draggedElement) {
+            console.log('Drag started on:', draggedElement);
             isDragging = true;
             setTimeout(() => draggedElement.classList.add('dragging'), 0);
         }
@@ -51,6 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // スマホ用タッチイベント
     let touchStartY = 0;
     taskList.addEventListener('touchstart', (e) => {
+        const reorderHandle = e.target.closest('.reorder-column');
+
+        if (!reorderHandle) {
+            console.log('Touch prevented: Not on reorder-column');
+            return;
+        }
+
         draggedElement = e.target.closest('tr');
         if (draggedElement) {
             touchStartY = e.touches[0].clientY;
