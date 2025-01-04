@@ -13,6 +13,42 @@
     background-color: #d4edda; /* 緑系 */
 }
 
+
+/* 選択されている優先度の背景色を変える */
+.priority-select option[value="1"] {
+    background-color: #f8d7da; /* 高優先度: 赤系 */
+}
+
+.priority-select option[value="5"] {
+    background-color: #fff3cd; /* 中優先度: 黄色系 */
+}
+
+.priority-select option[value="10"] {
+    background-color: #d4edda; /* 低優先度: 緑系 */
+}
+
+/* 選択時のスタイル */
+.priority-select {
+    transition: background-color 0.3s ease; /* 背景色をスムーズに変更 */
+}
+
+/* 高優先度: 赤系 */
+.priority-select[value="1"] {
+    background-color: #f8d7da;
+}
+
+/* 中優先度: 黄色系 */
+.priority-select[value="5"] {
+    background-color: #fff3cd;
+}
+
+/* 低優先度: 緑系 */
+.priority-select[value="10"] {
+    background-color: #d4edda;
+}
+
+
+
 /* 期限日時 */
 .due-date {
     font-size: 0.8rem; /* 小さい文字サイズに設定 */
@@ -76,4 +112,8 @@ form .form-control {
     font-size: 0.8rem; /* 小さい文字サイズに設定 */
     margin-top: 2px;   /* タイトルとの間に少し余白を追加 */
     color: #6c757d;    /* Bootstrapの muted カラー */
+}
+
+.d-flex.justify-content-center.align-items-center {
+    margin-bottom: 100px;
 }
