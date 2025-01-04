@@ -1,6 +1,8 @@
-# Django TODOアプリ
+# TODO管理アプリ: YARUNGO   
+## https://yarungo.com/
 
-このプロジェクトは、Django を使用して構築された TODO 管理アプリケーションです。
+このプロジェクトは Django を使用して構築された TODO 管理アプリケーションです。
+
 SaburiがDjango及びインフラ周りを学習する為に作成しました。
 
 ---
@@ -22,7 +24,6 @@ Docker を使用してアプリケーションを構築し、ローカル環境�
 
     ```bash
     python manage.py makemigrations
-    注意: 特に変更がない場合、No changes detected と表示されます。
 
     マイグレーションの適用
     python manage.py migrate
