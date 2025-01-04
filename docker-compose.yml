@@ -36,9 +36,11 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      # 環境変数で切り替え
-      - ${NGINX_CONF_FILE}:/etc/nginx/conf.d/default.conf
-      - ./ssl:/etc/ssl/private:ro
+      # 環境変数で指定されたnginx設定ファイルをマウント
+      - ./nginx/conf.d/${NGINX_CONF_FILE}:/etc/nginx/conf.d/default.conf:ro
+      # 証明書をコンテナ内にマウント
+      - /etc/letsencrypt/live/yarungo.com/fullchain.pem:/etc/ssl/private/fullchain.pem:ro
+      - /etc/letsencrypt/live/yarungo.com/privkey.pem:/etc/ssl/private/privkey.pem:ro
     depends_on:
       - web
     networks:
