@@ -1,9 +1,8 @@
-# Dockerfile
 FROM python:3.13-slim
 
 WORKDIR /app
 
-# 必要なライブラリをインストール
+# 必要なパッケージをインストール
 RUN apt-get update && apt-get install -y \
     gcc \
     default-libmysqlclient-dev \

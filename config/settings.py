@@ -22,7 +22,7 @@ SECRET_KEY = env('SECRET_KEY', default='default-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG', default=False)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '54.168.88.217', 'yarungo.com', 'www.yarungo.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '54.168.88.217', 'yarungo.com', 'www.yarungo.com', 'yarungo_web', 'nginx']
 
 # Application definition
 
@@ -141,6 +141,8 @@ AUTH_USER_MODEL = 'yarungo.CustomUser'
 SECURE_SSL_REDIRECT = env('SECURE_SSL_REDIRECT', default=False)
 SESSION_COOKIE_SECURE = env('SESSION_COOKIE_SECURE', default=False)
 CSRF_COOKIE_SECURE = env('CSRF_COOKIE_SECURE', default=False)
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # ログ設定
