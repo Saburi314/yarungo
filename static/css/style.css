@@ -114,6 +114,6 @@ form .form-control {
     color: #6c757d;    /* Bootstrapの muted カラー */
 }
 
-.d-flex.justify-content-center.align-items-center {
-    margin-bottom: 100px;
+main.container.mt-4 {
+    margin-bottom: 150px;
 }
