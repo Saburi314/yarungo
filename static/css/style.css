@@ -13,6 +13,10 @@
     background-color: #d4edda; /* 緑系 */
 }
 
+tr {
+    border-color: black;
+}
+
 
 /* 選択されている優先度の背景色を変える */
 .priority-select option[value="1"] {
