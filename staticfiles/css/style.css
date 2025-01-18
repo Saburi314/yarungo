@@ -13,6 +13,46 @@
     background-color: #d4edda; /* 緑系 */
 }
 
+tr {
+    border-color: black;
+}
+
+
+/* 選択されている優先度の背景色を変える */
+.priority-select option[value="1"] {
+    background-color: #f8d7da; /* 高優先度: 赤系 */
+}
+
+.priority-select option[value="5"] {
+    background-color: #fff3cd; /* 中優先度: 黄色系 */
+}
+
+.priority-select option[value="10"] {
+    background-color: #d4edda; /* 低優先度: 緑系 */
+}
+
+/* 選択時のスタイル */
+.priority-select {
+    transition: background-color 0.3s ease; /* 背景色をスムーズに変更 */
+}
+
+/* 高優先度: 赤系 */
+.priority-select[value="1"] {
+    background-color: #f8d7da;
+}
+
+/* 中優先度: 黄色系 */
+.priority-select[value="5"] {
+    background-color: #fff3cd;
+}
+
+/* 低優先度: 緑系 */
+.priority-select[value="10"] {
+    background-color: #d4edda;
+}
+
+
+
 /* 期限日時 */
 .due-date {
     font-size: 0.8rem; /* 小さい文字サイズに設定 */
@@ -76,4 +116,33 @@ form .form-control {
     font-size: 0.8rem; /* 小さい文字サイズに設定 */
     margin-top: 2px;   /* タイトルとの間に少し余白を追加 */
     color: #6c757d;    /* Bootstrapの muted カラー */
+}
+
+/* スマホ用の下部マージ */
+main.container.mt-4 {
+    margin-bottom: 150px;
+}
+
+/* gpt 誉める */
+.compliment-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4caf50; /* 緑色で成功を表現 */
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    opacity: 0; /* 初期状態は非表示 */
+    transition: all 0.5s ease; /* アニメーション効果 */
+    z-index: 1000; /* 最前面に表示 */
+    font-size: 1rem;
+    text-align: center;
+    max-width: 300px;
+    word-wrap: break-word;
+}
+
+.compliment-toast.show {
+    opacity: 1; /* 表示 */
+    transform: translateY(0); /* 元の位置に戻す */
 }

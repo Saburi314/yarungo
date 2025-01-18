@@ -9,6 +9,7 @@ from .views import (
     TaskDeleteAjaxView,
     TaskCompleteAjaxView,
     TaskReorderAjaxView,
+    TaskCompleteWithComplimentAjaxView,
 )
 
 urlpatterns = [
@@ -27,5 +28,6 @@ urlpatterns = [
     path('tasks/<int:pk>/update/', TaskUpdateView.as_view(), name='task_update'),
     path('tasks/<int:pk>/delete_ajax/', TaskDeleteAjaxView.as_view(), name='task_delete_ajax'),
     path('tasks/<int:pk>/complete_ajax/', TaskCompleteAjaxView.as_view(), name='task_complete_ajax'),
+    path('tasks/<int:pk>/generate_compliment_ajax/', TaskCompleteWithComplimentAjaxView.as_view(), name='generate_compliment_ajax'),
     path('tasks/reorder/', TaskReorderAjaxView.as_view(), name='task_reorder'),
 ]

@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     taskList.addEventListener('dragstart', (e) => {
         draggedElement = e.target.closest('tr');
         if (draggedElement) {
+            console.log('Drag started on:', draggedElement);
             isDragging = true;
             setTimeout(() => draggedElement.classList.add('dragging'), 0);
         }
@@ -51,6 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // スマホ用タッチイベント
     let touchStartY = 0;
     taskList.addEventListener('touchstart', (e) => {
+        const reorderHandle = e.target.closest('.reorder-column');
+
+        if (!reorderHandle) {
+            console.log('Touch prevented: Not on reorder-column');
+            return;
+        }
+
         draggedElement = e.target.closest('tr');
         if (draggedElement) {
             touchStartY = e.touches[0].clientY;
@@ -109,8 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // タスク完了処理
     function handleCompleteTask(button, row) {
         const taskId = row.dataset.taskId;
+
         if (!confirm('このタスクを完了にしますか？')) return;
 
+        // 完了処理リクエスト
         fetch(`/tasks/${taskId}/complete_ajax/`, {
             method: 'POST',
             headers: {
@@ -118,12 +128,78 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Content-Type': 'application/json',
             },
         })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.success) row.remove();
+        .then((response) => {
+            if (!response.ok) {
+                return response.json().then((data) => {
+                    console.error('Error in complete_ajax:', data.error);
+                    throw new Error(data.error);
+                });
+            }
+            return response.json();
         })
-        .catch(console.error);
+        .then((data) => {
+            if (data.success) {
+                // タスクを削除
+                row.remove();
+
+                // ChatGPTから褒め言葉を取得
+                return fetch(`/tasks/${taskId}/generate_compliment_ajax/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    },
+                });
+            } else {
+                console.error('Unexpected response in complete_ajax:', data);
+                throw new Error('Unexpected response in complete_ajax');
+            }
+        })
+        .then((response) => {
+            if (!response.ok) {
+                return response.json().then((data) => {
+                    console.error('Error in generate_compliment_ajax:', data.error);
+                    throw new Error(data.error);
+                });
+            }
+            return response.json();
+        })
+        .then((chatData) => {
+            if (chatData.success) {
+                // 褒め言葉を表示
+                showCompliment(chatData.compliment);
+            } else {
+                console.error('Unexpected response in generate_compliment_ajax:', chatData);
+            }
+        })
+        .catch((error) => {
+            console.error('Fetch error:', error);
+            alert('エラーが発生しました。詳細を確認してください。');
+        });
     }
+
+    function showCompliment(message) {
+        // 既存の褒め言葉ポップアップがある場合は削除
+        const existingToast = document.querySelector('.compliment-toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+    
+        // 褒め言葉ポップアップの作成
+        const complimentDiv = document.createElement('div');
+        complimentDiv.className = 'compliment-toast';
+        complimentDiv.textContent = message;
+        document.body.appendChild(complimentDiv);
+    
+        // アニメーションの追加
+        setTimeout(() => complimentDiv.classList.add('show'), 0);
+    
+        // 一定時間後に非表示にして削除
+        setTimeout(() => {
+            complimentDiv.classList.remove('show');
+            setTimeout(() => complimentDiv.remove(), 300);
+        }, 4000); // 5秒間表示
+    }    
 
     // タスク削除処理
     function handleDeleteTask(button, row) {

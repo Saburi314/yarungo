@@ -11,6 +11,8 @@ from django.http import JsonResponse
 import logging
 from django import forms
 from .models import Task
+from django.conf import settings
+import openai
 
 
 logger = logging.getLogger(__name__)
@@ -148,3 +150,28 @@ class CompletedTaskListView(LoginRequiredMixin, ListView):
             completed_at__isnull=False,
             deleted_at__isnull=True
         ).order_by('-completed_at')  # 完了日時で降順にソート
+
+class TaskCompleteWithComplimentAjaxView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        task_id = self.kwargs.get('pk')
+        try:
+            task = get_object_or_404(Task, id=task_id, user=self.request.user)
+
+            # ChatGPTを利用して褒め言葉を生成
+            openai.api_key = settings.OPENAI_API_KEY
+            response = openai.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "あなたはユーザーを励ますことが得意なAIです。"},
+                    {"role": "user", "content": f"タスク「{task.title}」を完了しました。完了したタスクの内容をタイトルから予測し、ユーモラスに短い言葉で褒めてください。"}
+                ]
+            )
+            compliment = response.choices[0].message.content
+
+            # タスクを保存
+            task.save(update_fields=['completed_at'])
+
+            return JsonResponse({'success': True, 'compliment': compliment})
+        except Exception as e:
+            logger.error(f"Task complete error: {str(e)}")
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
