@@ -126,8 +126,9 @@ main.container.mt-4 {
 /* gpt 誉める */
 .compliment-toast {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    top: 20px; /* 上部から20px */
+    left: 50%; /* 横方向の中央 */
+    transform: translateX(-50%); /* 真ん中に配置 */
     background-color: #4caf50; /* 緑色で成功を表現 */
     color: white;
     padding: 15px 20px;
@@ -144,5 +145,6 @@ main.container.mt-4 {
 
 .compliment-toast.show {
     opacity: 1; /* 表示 */
-    transform: translateY(0); /* 元の位置に戻す */
+    transform: translateX(-50%) translateY(0); /* 中央に表示 */
 }
+
