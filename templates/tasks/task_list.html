@@ -20,7 +20,13 @@
                 </button>
             </td>
             <td class="title-column">
-                <a href="{% url 'task_update' task.id %}" class="text-decoration-none">{{ task.title }}</a>
+                <a href="{% url 'task_update' task.id %}" class="text-decoration-none">
+                {% if task.title|length > 10 %}
+                    {{ task.title|slice:":10" }}...
+                {% else %}
+                    {{ task.title }}
+                {% endif %}
+                </a>
                 <div class="due-date text-muted">期限: {{ task.due_date|date:'Y-m-d H:i' }}</div>
             </td>
             <td class="delete-column">

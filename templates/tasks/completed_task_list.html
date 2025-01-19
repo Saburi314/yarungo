@@ -12,8 +12,11 @@
         <tr class="{{ task.get_priority_css_class }}" data-task-id="{{ task.id }}">
             <td>
                 <a href="{% url 'task_update' task.id %}" class="text-decoration-none">
+                {% if task.title|length > 10 %}
+                    {{ task.title|slice:":10" }}...
+                {% else %}
                     {{ task.title }}
-                </a>
+                {% endif %}                </a>
                 <div class="completed-date text-muted">
                     完了日時: {{ task.completed_at|date:"Y-m-d H:i" }}
                 </div>
