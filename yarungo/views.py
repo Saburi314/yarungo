@@ -162,8 +162,8 @@ class TaskCompleteWithComplimentAjaxView(LoginRequiredMixin, View):
             response = openai.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "あなたはユーザーを励ますことが得意なAIです。"},
-                    {"role": "user", "content": f"タスク「{task.title}」を完了しました。完了したタスクの内容をタイトルから予測し、ユーモラスに短い言葉で褒めてください。"}
+                    {"role": "system", "content": "あなたはユーザーを褒めたり賞賛したりする事が得意なAIです。"},
+                    {"role": "user", "content": f"タスク「{task.title}」を完了しました。完了したタスクの内容を基にユーモラスに20文字以内の言葉で褒めてください。"}
                 ]
             )
             compliment = response.choices[0].message.content

@@ -51,8 +51,6 @@ tr {
     background-color: #d4edda;
 }
 
-
-
 /* 期限日時 */
 .due-date {
     font-size: 0.8rem; /* 小さい文字サイズに設定 */
@@ -60,15 +58,20 @@ tr {
     color: #6c757d;    /* Bootstrapの muted カラー */
 }
 
+/* 完了アイコン */
+i.far.fa-circle.text-secondary {
+    margin-top: 0.85em;
+}
+
 /* 並び替えアイコン */
 .drag-handle {
-    font-size: 1.5rem; /* アイコンのサイズを大きくする */
+    font-size: 2.5rem; /* アイコンのサイズを大きくする */
     cursor: grab; /* マウスカーソルの見た目を保持 */
     display: flex; /* アイコンを中央寄せ */
     justify-content: center;
-    align-items: center;
     width: 2rem; /* 横幅を調整 */
     height: 2rem; /* 縦幅を調整 */
+    width: -webkit-fill-available;
 }
 
 .dragging {
@@ -89,11 +92,23 @@ tr {
 #task-list tr a, 
 #task-list tr button {
     cursor: pointer; /* クリック可能なカーソル */
+    width: -webkit-fill-available;
 }
 
 /* ドラッグ中の要素には手を離すカーソル */
 #task-list tr.dragging {
     cursor: grabbing;
+}
+
+/* 完了ボタン */
+button.btn.btn-warning.btn-sm.incomplete-task-btn {
+    padding: 10px;
+    width: -webkit-fill-available;
+}
+
+/* 削除ボタン */
+button.btn.btn-danger.btn-sm.delete-task-btn {
+    padding: 10px;
 }
 
 

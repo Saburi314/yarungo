@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             complimentDiv.classList.remove('show');
             setTimeout(() => complimentDiv.remove(), 300);
-        }, 4000); // 5秒間表示
+        }, 6000); // 6秒間表示
     }    
 
     // タスク削除処理
