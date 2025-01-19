@@ -106,6 +106,10 @@ button.btn.btn-warning.btn-sm.incomplete-task-btn {
     width: -webkit-fill-available;
 }
 
+td.reorder-column {
+    padding-top: 10px;
+}
+
 /* 削除ボタン */
 button.btn.btn-danger.btn-sm.delete-task-btn {
     padding: 10px;
